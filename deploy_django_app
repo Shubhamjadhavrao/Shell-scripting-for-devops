@@ -1,0 +1,51 @@
+#!/bin/bash
+
+<< task
+deploy a django app and handle error
+task
+
+code_clone() {
+      echo "Delpoy django app..."
+      git clone https://github.com/LondheShubham153/django-notes-app.git
+}
+
+install_requirements() {
+ 	echo "Installing Dependencies..."
+	sudo apt-get update && sudo apt-get install docker.io nginx -y docker-compose
+}
+
+required_restart() {
+	sudo chown $USER /var/run/docker.sock
+	#sudo systemctl enable docker
+	#sudo systemctl enable docker
+	#sudo systemctl restart docker
+}
+
+deploy() {
+	docker build -t notes-app .
+	#docker run -d -p 8000:8000 notes-app:latest
+	docker-compose up -d
+}
+
+echo "***************DEPLOYMENT STARTED*********************"
+
+if ! code_clone; then
+	echo "The Code Directory already exist"
+	cd django-notes-app
+fi	
+if ! install_requirements; then
+	echo "Installation Failed"
+	exit 1
+fi	
+if ! required_restart; then
+	echo "System Failed Identified"
+	exit 1
+fi	
+if ! deploy; then
+	echo "Deployment Failed, mail The admin"
+	#send mail to admin
+	#echo "Deployment failed on server: $(hostname) at $(date)" | mail -s "Deployment Alert" 28shubhamjadhav@gmail.com
+    exit 1
+fi	
+
+echo "***************DEPLOYMENT ENDED*********************"
